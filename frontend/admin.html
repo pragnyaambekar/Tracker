@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Streak Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #FFF7F3;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #fbf2edda;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar h2 {
+            margin: 0;
+            color: #8e6c82;
+        }
+
+        .nav-links a {
+            color: #8e6c82;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            color: #C599B6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fbf2edda;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #8e6c82;
+        }
+
+        .admin-badge {
+            background-color: #8e6c82;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            display: flex;
+            max-width: 400px;
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #E6B2BA;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            background-color: #C599B6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .users-table th,
+        .users-table td {
+            border: 1px solid #E6B2BA;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .users-table th {
+            background-color: #f9e8e3;
+            color: #8e6c82;
+            font-weight: bold;
+        }
+
+        .users-table tr:nth-child(even) {
+            background-color: #fff7f3;
+        }
+
+        .users-table tr:hover {
+            background-color: #f6e2db;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .status-active {
+            background-color: #6BAA75;
+        }
+
+        .status-inactive {
+            background-color: #E57373;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: white;
+        }
+
+        .btn-reset {
+            background-color: #FFA726;
+        }
+
+        .btn-reset:hover {
+            background-color: #FB8C00;
+        }
+
+        .btn-delete {
+            background-color: #EF5350;
+        }
+
+        .btn-delete:hover {
+            background-color: #E53935;
+        }
+
+        .btn-view {
+            background-color: #42A5F5;
+        }
+
+        .btn-view:hover {
+            background-color: #1E88E5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #FFF7F3;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-title {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #8e6c82;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #E6B2BA;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            background-color: #C599B6;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            background-color: #d8c6d1;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .loading:after {
+            content: " ";
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6px solid #C599B6;
+            border-color: #C599B6 transparent #C599B6 transparent;
+            animation: loading 1.2s linear infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .stats-card {
+            background-color: #FFF7F3;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .stat-item {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #C599B6;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #8e6c82;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-bar {
+                margin-top: 15px;
+                width: 100%;
+                max-width: none;
+            }
+
+            .users-table {
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-bar">
+        <h2>🔥 Streak Tracker</h2>
+        <div class="nav-links">
+            <a href="admin.html">Home</a>
+            <a href="login.html" id="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="admin-header">
+            <h1>Admin Panel <span class="admin-badge">Administrator</span></h1>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search by username...">
+                <button id="searchButton"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stat-item">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="totalUsers">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-value" id="activeUsers">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total Problems</div>
+                <div class="stat-value" id="totalProblems">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Longest Streak</div>
+                <div class="stat-value" id="longestStreak">0</div>
+            </div>
+        </div>
+
+        <h2>User Management</h2>
+        <div id="loading" class="loading"></div>
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Current Streak</th>
+                    <th>Problems Solved</th>
+                    <th>Last Active</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <!-- Users will be dynamically added here -->
+            </tbody>
+        </table>
+
+        <div class="pagination" id="pagination">
+            <!-- Pagination controls will be added here -->
+        </div>
+    </div>
+
+    <!-- Reset Streak Confirmation Modal -->
+    <div id="resetModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 class="modal-title">Reset User Streak</h3>
+            <p>Are you sure you want to reset the streak for <strong id="resetUserName"></strong>?</p>
+            <p>This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-delete" id="confirmResetBtn">Reset Streak</button>
+                <button class="btn btn-view" id="cancelResetBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 class="modal-title">Delete User</h3>
+            <p>Are you sure you want to delete <strong id="deleteUserName"></strong>?</p>
+            <p>This will permanently remove the user and all their data.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-delete" id="confirmDeleteBtn">Delete User</button>
+                <button class="btn btn-view" id="cancelDeleteBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 class="modal-title">Add New User</h3>
+            <div class="form-group">
+                <label for="newUsername">Username</label>
+                <input type="text" id="newUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label for="newPassword">Password</label>
+                <input type="password" id="newPassword" placeholder="Enter password">
+            </div>
+            <div class="form-group">
+                <label for="newTimezone">Timezone</label>
+                <select id="newTimezone">
+                    <option value="Asia/Kolkata">Indian Standard Time (IST)</option>
+                    <option value="America/Los_Angeles">Pacific Standard Time (PST)</option>
+                    <option value="America/New_York">Eastern Standard Time (EST)</option>
+                    <option value="Europe/London">Greenwich Mean Time (GMT)</option>
+                    <option value="Europe/Berlin">Central European Time (CET)</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-view" id="confirmAddUserBtn">Add User</button>
+                <button class="btn btn-reset" id="cancelAddUserBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Check if user is logged in as admin
+        // In admin.html
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if user is authenticated
+            if (!api.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Get current user
+            const currentUser = api.getCurrentUser();
+            console.log("Current user in admin page:", currentUser); // Add this for debugging
+
+            // Check if user is admin
+            if (!currentUser || !currentUser.isAdmin) {
+                console.log("User is not admin, redirecting"); // Add this for debugging
+                alert('Access denied. This page is only for administrators.');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            // Continue loading admin page for admin users
+            loadUsers();
+            loadStats();
+        });
+
+
+        // Variables for pagination
+        let currentPage = 1;
+        const usersPerPage = 10;
+        let totalUserCount = 0;
+        let allUsers = [];
+        let currentUserId = '';
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const usersTableBody = document.getElementById('usersTableBody');
+        const paginationDiv = document.getElementById('pagination');
+        const loadingDiv = document.getElementById('loading');
+
+        // Modal elements
+        const resetModal = document.getElementById('resetModal');
+        const deleteModal = document.getElementById('deleteModal');
+        const addUserModal = document.getElementById('addUserModal');
+        const resetUserName = document.getElementById('resetUserName');
+        const deleteUserName = document.getElementById('deleteUserName');
+        const confirmResetBtn = document.getElementById('confirmResetBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const confirmAddUserBtn = document.getElementById('confirmAddUserBtn');
+
+        // Stats elements
+        const totalUsersElement = document.getElementById('totalUsers');
+        const activeUsersElement = document.getElementById('activeUsers');
+        const totalProblemsElement = document.getElementById('totalProblems');
+        const longestStreakElement = document.getElementById('longestStreak');
+
+        // Add event listeners
+        document.getElementById('logout-btn').addEventListener('click', () => api.logout());
+        searchButton.addEventListener('click', searchUsers);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchUsers();
+        });
+
+        // Close modals when clicking the X
+        document.querySelectorAll('.close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => {
+                resetModal.style.display = 'none';
+                deleteModal.style.display = 'none';
+                addUserModal.style.display = 'none';
+            });
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === resetModal) resetModal.style.display = 'none';
+            if (e.target === deleteModal) deleteModal.style.display = 'none';
+            if (e.target === addUserModal) addUserModal.style.display = 'none';
+        });
+
+        // Cancel buttons for modals
+        document.getElementById('cancelResetBtn').addEventListener('click', () => {
+            resetModal.style.display = 'none';
+        });
+
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+            deleteModal.style.display = 'none';
+        });
+
+        document.getElementById('cancelAddUserBtn').addEventListener('click', () => {
+            addUserModal.style.display = 'none';
+        });
+
+        // Confirm reset streak
+        confirmResetBtn.addEventListener('click', async () => {
+            try {
+                await resetUserStreak(currentUserId);
+                resetModal.style.display = 'none';
+                loadUsers(); // Reload user data
+                await loadStats();
+            } catch (error) {
+                console.error('Error resetting streak:', error);
+                alert('Failed to reset streak. Please try again.');
+            }
+        });
+
+        // Confirm delete user
+        confirmDeleteBtn.addEventListener('click', async () => {
+            try {
+                await deleteUser(currentUserId);
+                deleteModal.style.display = 'none';
+                loadUsers(); // Reload user data
+                await loadStats();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Failed to delete user. Please try again.');
+            }
+        });
+
+        // Add new user
+        confirmAddUserBtn.addEventListener('click', async () => {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value;
+            const timezone = document.getElementById('newTimezone').value;
+
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+
+            try {
+                await addUser(username, password, timezone);
+                addUserModal.style.display = 'none';
+                loadUsers(); // Reload user data
+                await loadStats();
+            } catch (error) {
+                console.error('Error adding user:', error);
+                alert('Failed to add user. Please try again.');
+            }
+        });
+
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            loadStats();
+        });
+
+        // Functions
+        async function loadUsers(page = 1, searchTerm = '') {
+            try {
+                loadingDiv.style.display = 'block';
+
+                // Call API to get admin data with users
+                const response = await fetch(`${api.baseUrl}/admin/users?page=${page}&limit=${usersPerPage}&search=${searchTerm}`, {
+                    headers: api.getHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load user data');
+                }
+
+                const data = await response.json();
+
+                // Get current admin username for filtering
+                const currentUser = api.getCurrentUser();
+                const adminUsername = currentUser ? currentUser.username : '';
+
+                console.log("Admin username:", adminUsername);
+                console.log("All users before filtering:", data.users);
+
+                // Filter out admin users by username and isAdmin flag
+                allUsers = data.users.filter(user => {
+                    // Filter out any user that has isAdmin=true OR has the same username as the current admin
+                    return !user.isAdmin && user.username !== adminUsername && user.username !== 'admin';
+                });
+
+                console.log("Filtered users:", allUsers);
+
+                // Adjust total count by removing admin users
+                totalUserCount = data.total - (data.users.length - allUsers.length);
+
+                renderUsers(allUsers);
+                renderPagination(totalUserCount, currentPage);
+
+                loadingDiv.style.display = 'none';
+            } catch (error) {
+                console.error('Error loading users:', error);
+                loadingDiv.style.display = 'none';
+                alert('Failed to load user data. Please try again later.');
+            }
+        }
+
+        function renderUsers(users) {
+            usersTableBody.innerHTML = '';
+
+            if (users.length === 0) {
+                usersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No users found</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            users.forEach(user => {
+                const lastActive = user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Never';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.currentStreak || 0}</td>
+                    <td>${user.problemsSolved || 0} / ${user.totalProblems || 0}</td>
+                    <td>${lastActive}</td>
+                    <td>
+                        <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
+                            ${user.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-reset" data-id="${user._id}" data-username="${user.username}" onclick="showResetModal('${user._id}', '${user.username}')">
+                                Reset Streak
+                            </button>
+                            <button class="btn btn-delete" data-id="${user._id}" data-username="${user.username}" onclick="showDeleteModal('${user._id}', '${user.username}')">
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                usersTableBody.appendChild(row);
+            });
+        }
+
+        function renderPagination(total, current) {
+            const totalPages = Math.ceil(total / usersPerPage);
+            paginationDiv.innerHTML = '';
+
+            // Previous button
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.disabled = current === 1;
+            prevButton.addEventListener('click', () => {
+                if (current > 1) {
+                    currentPage--;
+                    loadUsers(currentPage, searchInput.value.trim());
+                }
+            });
+            paginationDiv.appendChild(prevButton);
+
+            // Page numbers (show max 5)
+            const maxPagesToShow = 5;
+            const startPage = Math.max(1, current - Math.floor(maxPagesToShow / 2));
+            const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.disabled = i === current;
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    loadUsers(currentPage, searchInput.value.trim());
+                });
+                paginationDiv.appendChild(pageButton);
+            }
+
+            // Next button
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.disabled = current === totalPages || totalPages === 0;
+            nextButton.addEventListener('click', () => {
+                if (current < totalPages) {
+                    currentPage++;
+                    loadUsers(currentPage, searchInput.value.trim());
+                }
+            });
+            paginationDiv.appendChild(nextButton);
+        }
+
+        function searchUsers() {
+            const searchTerm = searchInput.value.trim();
+            currentPage = 1; // Reset to first page when searching
+            loadUsers(currentPage, searchTerm);
+        }
+
+        function showResetModal(userId, username) {
+            resetUserName.textContent = username;
+            currentUserId = userId;
+            resetModal.style.display = 'block';
+        }
+
+        function showDeleteModal(userId, username) {
+            deleteUserName.textContent = username;
+            currentUserId = userId;
+            deleteModal.style.display = 'block';
+        }
+
+        async function resetUserStreak(userId) {
+            const response = await fetch(`${api.baseUrl}/admin/users/${userId}/reset-streak`, {
+                method: 'POST',
+                headers: api.getHeaders()
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to reset streak');
+            }
+
+            return response.json();
+        }
+
+        async function deleteUser(userId) {
+            const response = await fetch(`${api.baseUrl}/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: api.getHeaders()
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to delete user');
+            }
+
+            return response.json();
+        }
+
+        async function addUser(username, password, timezone) {
+            const response = await fetch(`${api.baseUrl}/admin/users`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': api.getHeaders().Authorization
+                },
+                body: JSON.stringify({ username, password, timezone })
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to add user');
+            }
+
+            return response.json();
+        }
+
+        async function loadStats() {
+            try {
+                // First, get the full list of users to count active non-admin users correctly
+                const usersResponse = await fetch(`${api.baseUrl}/admin/users?limit=1000`, {
+                    headers: api.getHeaders()
+                });
+
+                if (!usersResponse.ok) {
+                    throw new Error('Failed to load user data');
+                }
+
+                const usersData = await usersResponse.json();
+
+                // Get current admin username for filtering
+                const currentUser = api.getCurrentUser();
+                const adminUsername = currentUser ? currentUser.username : '';
+
+                // Filter out admin users
+                const regularUsers = usersData.users.filter(user => {
+                    return !user.isAdmin && user.username !== adminUsername && user.username !== 'admin';
+                });
+
+                // Count total regular users
+                const totalRegularUsers = regularUsers.length;
+
+                // Count active regular users based on last activity and current streak
+                // A user is considered active if they have a current streak > 0 or have logged in recently
+                const activeRegularUsers = regularUsers.filter(user => {
+                    // Check if user has a current streak
+                    const hasStreak = user.currentStreak > 0;
+
+                    // Check if user has logged in recently (within the last 30 days)
+                    const hasRecentActivity = user.lastActive &&
+                        (new Date().getTime() - new Date(user.lastActive).getTime()) < (30 * 24 * 60 * 60 * 1000);
+
+                    return hasStreak || hasRecentActivity;
+                }).length;
+
+                // Get other stats from the stats endpoint
+                const statsResponse = await fetch(`${api.baseUrl}/admin/stats`, {
+                    headers: api.getHeaders()
+                });
+
+                if (!statsResponse.ok) {
+                    throw new Error('Failed to load statistics');
+                }
+
+                const stats = await statsResponse.json();
+
+                // Update the UI with correct counts
+                totalUsersElement.textContent = totalRegularUsers;
+                activeUsersElement.textContent = activeRegularUsers;
+                totalProblemsElement.textContent = stats.totalProblems || 0;
+                longestStreakElement.textContent = stats.longestStreak || 0;
+
+                // Log for debugging
+                console.log("Total regular users:", totalRegularUsers);
+                console.log("Active regular users:", activeRegularUsers);
+                console.log("Regular users data:", regularUsers);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        // Expose functions for onclick handlers
+        window.showResetModal = showResetModal;
+        window.showDeleteModal = showDeleteModal;
+    </script>
+</body>
+
+</html>

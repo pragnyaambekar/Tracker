@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparison Dashboard - Streak & Problem Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #FFF7F3;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .page-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: auto;
+            background: #fbf2edda;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1, h2, h3 {
+            color: #8e6c82;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #fbf2edda;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar h2 {
+            margin: 0;
+            color: #8e6c82;
+        }
+
+        .nav-links a {
+            color: #8e6c82;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            color: #C599B6;
+        }
+
+        .comparison-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .user-column {
+            background: #FFF7F3;
+            padding: 10px;
+            border-radius: 10px;
+            width: 28%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .user-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 90px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #C599B6;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .user-column h3 {
+            color: #8e6c82;
+            margin-top: 0;
+        }
+
+        .clock {
+            font-size: 16px;
+            font-weight: bold;
+            color: #C599B6;
+            margin-bottom: 10px;
+        }
+
+        .stats-container {
+            background: #e6b2ba49;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .streak-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #C599B6;
+            margin: 10px 0;
+        }
+
+        .progress-item {
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .progress-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #f0e9e5;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #C599B6;
+            border-radius: 10px;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .achievement-badge {
+            background: #E6B2BA;
+            color: white;
+            padding: 5px;
+            margin: 5px;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .achievements {
+            margin: 10px 0;
+            min-height: 30px;
+        }
+
+        button {
+            background-color: #C599B6;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #A87F98;
+        }
+
+        .category-progress {
+            margin-top: 20px;
+        }
+
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #E6B2BA;
+            text-align: left;
+        }
+
+        .category-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-name {
+            font-weight: bold;
+        }
+
+        .category-count {
+            color: #8e6c82;
+        }
+
+        .win-indicator {
+            font-size: 24px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .admin-controls {
+            margin-top: 30px;
+            padding: 20px;
+            background: #FFF7F3;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .admin-controls button {
+            margin: 0 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-left: 10px;
+            color: white;
+        }
+
+        .status-active {
+            background-color: #6BAA75;
+        }
+
+        .status-danger {
+            background-color: #E57373;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px auto;
+            text-align: center;
+        }
+        
+        .loading:after {
+            content: " ";
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6px solid #C599B6;
+            border-color: #C599B6 transparent #C599B6 transparent;
+            animation: loading 1.2s linear infinite;
+        }
+        
+        @keyframes loading {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .comparison-container {
+                flex-direction: column;
+            }
+
+            .user-column {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-bar">
+        <h2>🔥 Streak Tracker</h2>
+        <div class="nav-links">
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="#" id="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="page-content">
+        <div class="container">
+            <h1>User Comparison</h1>
+            <p>See how everyone is progressing and get inspired!</p>
+            
+            <div id="loading" class="loading"></div>
+            
+            <div id="comparison-container" class="comparison-container">
+                <!-- User columns will be dynamically added here -->
+            </div>
+
+            <div class="admin-controls" id="admin-controls" style="display: none;">
+                <h3>Admin Controls</h3>
+                <div id="reset-buttons">
+                    <!-- Reset buttons will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Check if user is logged in
+        if (!api.isAuthenticated()) {
+            window.location.href = 'login.html';
+        }
+        
+        // Get current user
+        const currentUser = api.getCurrentUser();
+        if (!currentUser) {
+            api.logout();
+        }
+        
+        // Load data
+        loadComparisonData();
+        
+        // Add event listeners
+        document.getElementById('logout-btn').addEventListener('click', () => api.logout());
+        
+        // Set up clocks
+        setInterval(updateClocks, 1000);
+        
+        async function loadComparisonData() {
+            try {
+                // Show loading
+                document.getElementById('loading').style.display = 'block';
+                
+                // Fetch comparison data
+                const response = await fetch(`${api.baseUrl}/comparison`, {
+                    headers: api.getHeaders()
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch comparison data');
+                }
+                
+                const usersData = await response.json();
+                
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                
+                // Display user data
+                const comparisonContainer = document.getElementById('comparison-container');
+                comparisonContainer.innerHTML = '';
+                
+                // For admin controls
+                const resetButtons = document.getElementById('reset-buttons');
+                resetButtons.innerHTML = '';
+                
+                // Check if current user is admin (add your logic here)
+                const isAdmin = true; // For now, let everyone see admin controls
+                
+                if (isAdmin) {
+                    document.getElementById('admin-controls').style.display = 'block';
+                }
+                
+                // Sort users by streak (highest first)
+                usersData.sort((a, b) => b.streak - a.streak);
+                
+                // Create column for each user
+                usersData.forEach(user => {
+                    const userColumn = createUserColumn(user);
+                    comparisonContainer.appendChild(userColumn);
+                    
+                    // Add reset button for admin
+                    if (isAdmin) {
+                        const resetButton = document.createElement('button');
+                        resetButton.textContent = `Reset ${user.username}'s Streak`;
+                        resetButton.onclick = () => resetStreak(user.id);
+                        resetButtons.appendChild(resetButton);
+                    }
+                });
+                
+                // Update clocks
+                updateClocks();
+            } catch (error) {
+                console.error('Error loading comparison data:', error);
+                document.getElementById('loading').style.display = 'none';
+                alert('Failed to load comparison data. Please try again later.');
+            }
+        }
+        
+        function createUserColumn(user) {
+            const userColumn = document.createElement('div');
+            userColumn.className = 'user-column';
+            userColumn.id = `user-${user.id}`;
+            
+            // Calculate total problems and solved percentage
+            const solvedPercent = Math.round((user.solvedCount / user.totalProblems) * 100) || 0;
+            
+            // Get timezone abbreviation and flag
+            let timeLabel = 'Local';
+            let flag = '🌍';
+            
+            if (user.timezone === 'Asia/Kolkata') {
+                timeLabel = 'IST';
+                flag = '🇮🇳';
+            } else if (user.timezone === 'America/Los_Angeles') {
+                timeLabel = 'PST';
+                flag = '🇺🇸';
+            } else if (user.timezone === 'America/New_York') {
+                timeLabel = 'EST';
+                flag = '🇺🇸';
+            } else if (user.timezone === 'Europe/London') {
+                timeLabel = 'GMT';
+                flag = '🇬🇧';
+            } else if (user.timezone === 'Europe/Berlin') {
+                timeLabel = 'CET';
+                flag = '🇪🇺';
+            } else if (user.timezone === 'Asia/Tokyo') {
+                timeLabel = 'JST';
+                flag = '🇯🇵';
+            } else if (user.timezone === 'Australia/Sydney') {
+                timeLabel = 'AEST';
+                flag = '🇦🇺';
+            }
+            
+            // Format username
+            const displayName = user.username.charAt(0).toUpperCase() + user.username.slice(1);
+            
+            // Create user column HTML
+            userColumn.innerHTML = `
+                <div class="user-header">
+                    <img src="${user.avatarUrl || '/api/placeholder/90/100'}" alt="${user.username}'s avatar" class="user-avatar">
+                    <div>
+                        <h3>${displayName} 
+                            <span class="status-badge ${user.streakActive ? 'status-active' : 'status-danger'}">
+                                ${user.streakActive ? 'Active' : 'Streak lost'}
+                            </span>
+                        </h3>
+                        <div class="clock" data-timezone="${user.timezone}">
+                            ${flag} ${timeLabel}: Loading...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-container">
+                    <h4>Current Streak</h4>
+                    <div class="streak-display">${user.streak}</div>
+                    <div class="achievements">
+                        ${user.achievements.map(a => `<div class="achievement-badge">${a.badgeText}</div>`).join('')}
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Problems Solved</span>
+                        <span>${user.solvedCount}/${user.totalProblems}</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${solvedPercent}%">${solvedPercent}%</div>
+                    </div>
+                </div>
+
+                <div class="category-progress">
+                    <h4>Category Progress</h4>
+                    <div class="category-list">
+                        ${generateCategoryList(user.categoryProgress)}
+                    </div>
+                </div>
+            `;
+            
+            return userColumn;
+        }
+        
+        function generateCategoryList(categoryProgress) {
+            let html = '';
+            
+            for (const category in categoryProgress) {
+                const { completed, total } = categoryProgress[category];
+                
+                // Format category name with proper capitalization
+                const displayName = category.charAt(0).toUpperCase() + 
+                    category.slice(1).replace(/([A-Z])/g, ' $1').trim();
+                
+                html += `
+                    <div class="category-item">
+                        <span class="category-name">${displayName}</span>
+                        <span class="category-count">${completed}/${total}</span>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+        
+        function updateClocks() {
+            const now = new Date();
+            
+            // Update all clocks
+            document.querySelectorAll('.clock[data-timezone]').forEach(clock => {
+                const timezone = clock.dataset.timezone;
+                
+                try {
+                    // Get abbreviated timezone
+                    let timeLabel = 'Local';
+                    let flag = '🌍';
+                    
+                    if (timezone === 'Asia/Kolkata') {
+                        timeLabel = 'IST';
+                        flag = '🇮🇳';
+                    } else if (timezone === 'America/Los_Angeles') {
+                        timeLabel = 'PST';
+                        flag = '🇺🇸';
+                    } else if (timezone === 'America/New_York') {
+                        timeLabel = 'EST';
+                        flag = '🇺🇸';
+                    } else if (timezone === 'Europe/London') {
+                        timeLabel = 'GMT';
+                        flag = '🇬🇧';
+                    } else if (timezone === 'Europe/Berlin') {
+                        timeLabel = 'CET';
+                        flag = '🇪🇺';
+                    } else if (timezone === 'Asia/Tokyo') {
+                        timeLabel = 'JST';
+                        flag = '🇯🇵';
+                    } else if (timezone === 'Australia/Sydney') {
+                        timeLabel = 'AEST';
+                        flag = '🇦🇺';
+                    }
+                    
+                    const localTime = now.toLocaleTimeString('en-US', { 
+                        timeZone: timezone, 
+                        hour12: true 
+                    });
+                    
+                    clock.textContent = `${flag} ${timeLabel}: ${localTime}`;
+                } catch (error) {
+                    console.error('Error updating clock:', error);
+                    clock.textContent = `🌍 Local: ${now.toLocaleTimeString()}`;
+                }
+            });
+        }
+        
+        async function resetStreak(userId) {
+            if (confirm('Are you sure you want to reset this user\'s streak?')) {
+                try {
+                    await api.resetStreak(userId);
+                    alert('Streak reset successfully!');
+                    loadComparisonData(); // Reload data
+                } catch (error) {
+                    console.error('Error resetting streak:', error);
+                    alert('Failed to reset streak. Please try again later.');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

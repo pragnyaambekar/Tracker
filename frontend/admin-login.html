@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Streak Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #FFF7F3;
+            color: #333333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            max-width: 400px;
+            background: #fbf2edda;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #8e6c82;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            color: #C599B6;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #8e6c82;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #E6B2BA;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #C599B6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            width: 100%;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #A87F98;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .admin-badge {
+            background-color: #8e6c82;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            color: #8e6c82;
+        }
+
+        .back-link a {
+            color: #C599B6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>Admin Login <span class="admin-badge">Admin</span></h1>
+        <p class="subtitle">Login to access administrator features</p>
+
+        <div id="error-message" class="error-message">Invalid username or password</div>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter admin username">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter admin password">
+        </div>
+
+        <button id="login-btn">Login</button>
+        <p class="back-link">
+            <a href="index.html">&larr; Back to Home</a>
+        </p>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Check if already logged in
+        if (api.isAuthenticated()) {
+            window.location.href = 'admin.html';
+        }
+
+        // Login function
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (!username || !password) {
+                errorMessage.textContent = 'Please enter both username and password';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            try {
+                // Call API to login
+                const user = await api.login(username, password);
+                console.log("Login response:", user); // Add this debug line
+
+                // Check if user is admin
+                if (user && user.isAdmin) {
+                    console.log("Admin detected, redirecting to admin.html");
+                    window.location.href = 'admin.html';
+                } else {
+                    console.log("Not an admin user:", user);
+                    errorMessage.textContent = 'You do not have administrator privileges';
+                    errorMessage.style.display = 'block';
+                    // Log out non-admin users
+                    api.logout();
+                }
+            } catch (error) {
+                console.error("Login error:", error);
+                errorMessage.textContent = error.message || 'Invalid username or password';
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('login-btn').addEventListener('click', login);
+
+        // Add enter key support
+        document.getElementById('password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Dashboard - Streak & Problem Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #FFF7F3;
+            color: #333333;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fbf2edda;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1,
+        h2 {
+            color: #8e6c82;
+        }
+
+        .motivation {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .user-info img {
+            width: 90px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #C599B6;
+        }
+
+        .user-info-text {
+            text-align: left;
+        }
+
+        .clock {
+            font-size: 16px;
+            font-weight: bold;
+            color: #C599B6;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+
+        .streak-container {
+            font-size: 20px;
+            margin: 20px 0;
+            background: #FFF7F3;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .status {
+            font-size: 14px;
+            color: #000;
+            margin-top: 10px;
+        }
+
+        .achievement-badge {
+            background: #E6B2BA;
+            color: white;
+            padding: 5px;
+            margin: 5px;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .achievements {
+            margin: 10px 0;
+            min-height: 30px;
+        }
+
+        button {
+            background-color: #C599B6;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #A87F98;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .lost-streak {
+            color: red;
+            font-weight: bold;
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fbf2edda;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-bar h2 {
+            margin: 0;
+            color: #8e6c82;
+        }
+
+        .nav-links a {
+            color: #8e6c82;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            color: #C599B6;
+        }
+
+        .collapsible {
+            background-color: #C599B6;
+            color: white;
+            cursor: pointer;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .active,
+        .collapsible:hover {
+            background-color: #A87F98;
+        }
+
+        .content {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
+            background-color: #f0e9e5;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .content ul {
+            list-style-type: none;
+            padding-left: 5px;
+        }
+
+        .content li {
+            padding: 8px 0;
+            border-bottom: 1px solid #E6B2BA;
+            text-align: left;
+        }
+
+        .content li:last-child {
+            border-bottom: none;
+        }
+
+        .content input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .progress-summary {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .progress-card {
+            background: #FFF7F3;
+            padding: 15px;
+            border-radius: 10px;
+            width: 30%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #C599B6;
+        }
+
+        .logout-btn {
+            background-color: #E6B2BA;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .loading:after {
+            content: " ";
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin: 8px;
+            border-radius: 50%;
+            border: 6px solid #C599B6;
+            border-color: #C599B6 transparent #C599B6 transparent;
+            animation: loading 1.2s linear infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Modal styles for change password */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #FFF7F3;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-title {
+            margin-top: 0;
+            color: #8e6c82;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #8e6c82;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #E6B2BA;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #27ae60;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-bar">
+        <h2>🔥 Streak Tracker</h2>
+        <div class="nav-links">
+            <a href="comparison.html">Compare Progress</a>
+            <!-- <a href="#" id="change-password-btn">Change Password</a> -->
+            <a href="#" id="logout-btn" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="user-info">
+            <div class="user-info-text">
+                <h1>Welcome, <span id="userName">User</span>!</h1>
+                <p class="motivation" id="motivationText">Keep pushing forward and maintain your streak! 🚀</p>
+            </div>
+            <div>
+                <div id="userClock" class="clock">Loading time...</div>
+                <img src="" alt="User avatar" id="userAvatar">
+            </div>
+        </div>
+        <div class="streak-container">
+            <h2>Your Current Streak</h2>
+            <p>🔥 <span id="userStreak" class="progress-number">0</span> Days</p>
+            <p id="userStatus" class="status">Update to keep streak alive!</p>
+            <div id="userAchievements" class="achievements"></div>
+            <button id="updateButton">Update Today's Progress</button>
+        </div>
+        <div class="progress-summary">
+            <div class="progress-card">
+                <p>Problems Solved</p>
+                <div id="problemsSolved" class="progress-number">0</div>
+            </div>
+            <div class="progress-card">
+                <p>Categories Completed</p>
+                <div id="categoriesCompleted" class="progress-number">0</div>
+            </div>
+            <div class="progress-card">
+                <p>Current Pace</p>
+                <div id="currentPace" class="progress-number">0</div>
+                <div>problems/week</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>NeetCode Progress Tracker</h2>
+        <div id="loading" class="loading"></div>
+        <div id="problem-categories">
+            <!-- Problem categories will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <!-- <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 class="modal-title">Change Password</h3>
+
+            <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <input type="password" id="currentPassword" placeholder="Enter current password">
+            </div>
+
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm New Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm new password">
+            </div>
+
+            <div id="passwordError" class="error-message"></div>
+            <div id="passwordSuccess" class="success-message"></div>
+
+            <div class="modal-buttons">
+                <button class="btn" id="cancelPasswordBtn">Cancel</button>
+                <button class="btn" id="changePasswordBtn">Change Password</button>
+            </div>
+        </div>
+    </div> -->
+
+    <script src="js/api.js"></script>
+    <script>
+        // Check if user is logged in
+        if (!api.isAuthenticated()) {
+            window.location.href = 'login.html';
+        }
+        // Get current user
+        const currentUser = api.getCurrentUser();
+        if (!currentUser) {
+            api.logout();
+        }
+        // Set username in the UI
+        document.getElementById('userName').textContent =
+            currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1);
+        // Set user avatar
+        const userAvatar = document.getElementById('userAvatar');
+        userAvatar.src = currentUser.avatarUrl || '/api/placeholder/90/100';
+        userAvatar.alt = currentUser.username + "'s avatar";
+
+        let userStreak = 0;
+        let streakActive = true;
+
+        // Motivational messages
+        const motivationalMessages = [
+            "Keep pushing forward and maintain your streak! 🚀",
+            "Consistency is the key to mastery! 💪",
+            "Every problem solved brings you closer to your goals! ✨",
+            "Remember: small steps every day lead to big results! 🏆",
+            "You're building your coding muscles one problem at a time! 💻"
+        ];
+
+        // Set random motivation text
+        document.getElementById('motivationText').textContent =
+            motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+
+        // Load user data
+        loadUserData();
+
+        // Update time display
+        updateTimeDisplay();
+        setInterval(updateTimeDisplay, 1000);
+
+        // Add event listeners
+        document.getElementById('updateButton').addEventListener('click', updateStreak);
+        document.getElementById('logout-btn').addEventListener('click', () => api.logout());
+
+      
+
+        // Function to load all user data
+        async function loadUserData() {
+            try {
+                // Show loading
+                document.getElementById('loading').style.display = 'block';
+
+                // Get streak data
+                const streakData = await api.getStreak();
+                userStreak = streakData.currentStreak;
+                streakActive = streakData.streakActive;
+                document.getElementById('userStreak').textContent = userStreak;
+
+                // Update streak status
+                if (!streakActive) {
+                    document.getElementById('userStatus').textContent = "Streak lost! Start again today.";
+                    document.getElementById('userStatus').classList.add('lost-streak');
+                } else {
+                    document.getElementById('userStatus').textContent = "Streak is active! Keep it going!";
+                    document.getElementById('userStatus').classList.remove('lost-streak');
+                }
+
+                // Get achievements
+                await loadAchievements();
+
+                // Get problems
+                await loadProblems();
+
+                // Get stats
+                await loadStats();
+
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                alert('Error loading data. Please try again later.');
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Load and display user achievements
+        async function loadAchievements() {
+            try {
+                const achievements = await fetch(`${api.baseUrl}/achievements`, {
+                    headers: api.getHeaders()
+                }).then(res => res.json());
+
+                const achievementsDiv = document.getElementById('userAchievements');
+                achievementsDiv.innerHTML = "";
+
+                // Filter earned achievements based on current streak
+                const earnedAchievements = achievements.filter(achievement =>
+                    userStreak >= achievement.threshold);
+
+                // Add badges for earned achievements
+                earnedAchievements.forEach(achievement => {
+                    const badge = document.createElement('div');
+                    badge.className = 'achievement-badge';
+                    badge.textContent = achievement.badgeText;
+                    badge.title = achievement.description;
+                    achievementsDiv.appendChild(badge);
+                });
+            } catch (error) {
+                console.error('Error loading achievements:', error);
+            }
+        }
+
+        // Load and display problems
+        async function loadProblems() {
+            try {
+                const problemsByCategory = await api.getProblems();
+                const problemCategoriesDiv = document.getElementById('problem-categories');
+                problemCategoriesDiv.innerHTML = "";
+
+                // Create collapsible sections for each category
+                for (const category in problemsByCategory) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category';
+
+                    // Format category name with proper capitalization
+                    const displayName = category.charAt(0).toUpperCase() +
+                        category.slice(1).replace(/([A-Z])/g, ' $1').trim();
+
+                    categoryDiv.innerHTML = `
+                        <button class="collapsible">${displayName}</button>
+                        <div class="content">
+                            <ul id="${category}Problems"></ul>
+                        </div>
+                    `;
+
+                    problemCategoriesDiv.appendChild(categoryDiv);
+
+                    // Add problems to the category list
+                    const problemsList = document.getElementById(`${category}Problems`);
+                    problemsByCategory[category].forEach(problem => {
+                        const li = document.createElement('li');
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.checked = problem.completed;
+                        checkbox.dataset.id = problem.id;
+                        checkbox.addEventListener('change', toggleProblem);
+                        li.appendChild(checkbox);
+                        li.appendChild(document.createTextNode(problem.name));
+                        problemsList.appendChild(li);
+                    });
+                }
+
+                // Add collapsible functionality
+                const collapsibles = document.querySelectorAll('.collapsible');
+                collapsibles.forEach(button => {
+                    button.addEventListener('click', function () {
+                        this.classList.toggle('active');
+                        const content = this.nextElementSibling;
+                        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading problems:', error);
+            }
+        }
+
+        // Load and display statistics
+        async function loadStats() {
+            try {
+                const stats = await fetch(`${api.baseUrl}/stats`, {
+                    headers: api.getHeaders()
+                }).then(res => res.json());
+
+                document.getElementById('problemsSolved').textContent = stats.solvedProblems;
+                document.getElementById('categoriesCompleted').textContent = stats.completedCategories;
+                document.getElementById('currentPace').textContent = stats.pace;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Update streak
+        async function updateStreak() {
+            try {
+                document.getElementById('updateButton').disabled = true;
+
+                // Call API to update streak
+                const response = await api.updateStreak();
+
+                // Update UI
+                userStreak = response.currentStreak;
+                document.getElementById('userStreak').textContent = userStreak;
+                document.getElementById('userStatus').textContent = "🔥 Streak is going strong!";
+                document.getElementById('userStatus').classList.remove('lost-streak');
+
+                // Update achievements
+                await loadAchievements();
+
+                // Celebration
+                startConfetti();
+
+                // Re-enable button
+                document.getElementById('updateButton').disabled = false;
+            } catch (error) {
+                console.error('Error updating streak:', error);
+                alert(error.message || 'Failed to update streak. Try again later.');
+                document.getElementById('updateButton').disabled = false;
+            }
+        }
+
+        // Toggle problem completion
+        async function toggleProblem() {
+            try {
+                const problemId = this.dataset.id;
+
+                // Call API to toggle problem status
+                await api.toggleProblem(problemId);
+
+                // Update stats immediately after toggling
+                await loadStats();
+                console.log("Problem toggled, stats refreshed");
+            } catch (error) {
+                console.error('Error toggling problem:', error);
+                alert('Failed to update problem status. Try again later.');
+                // Revert checkbox state
+                this.checked = !this.checked;
+            }
+        }
+
+        function updateTimeDisplay() {
+            const now = new Date();
+            const timeZone = currentUser.timezone;
+
+            // Get region and timezone abbreviation
+            let timeLabel = 'Local';
+            let flag = '🌍';
+
+            if (timeZone === 'Asia/Kolkata') {
+                timeLabel = 'IST';
+                flag = '🇮🇳';
+            } else if (timeZone === 'America/Los_Angeles') {
+                timeLabel = 'PST';
+                flag = '🇺🇸';
+            } else if (timeZone === 'America/New_York') {
+                timeLabel = 'EST';
+                flag = '🇺🇸';
+            } else if (timeZone === 'Europe/London') {
+                timeLabel = 'GMT';
+                flag = '🇬🇧';
+            } else if (timeZone === 'Europe/Berlin') {
+                timeLabel = 'CET';
+                flag = '🇪🇺';
+            } else if (timeZone === 'Asia/Tokyo') {
+                timeLabel = 'JST';
+                flag = '🇯🇵';
+            } else if (timeZone === 'Australia/Sydney') {
+                timeLabel = 'AEST';
+                flag = '🇦🇺';
+            }
+
+            const localTime = now.toLocaleTimeString('en-US', {
+                timeZone: timeZone,
+                hour12: true
+            });
+
+            document.getElementById('userClock').textContent = `${flag} ${timeLabel}: ${localTime}`;
+        }
+
+        function startConfetti() {
+            var duration = 3 * 1000; // 3 seconds
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            })();
+        }
+    </script>
+</body>
+
+</html>
