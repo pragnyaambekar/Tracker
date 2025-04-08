@@ -72,6 +72,7 @@ class API {
   }
 
   // Profile methods
+  // Profile methods
   async updateProfile(timezone, avatarFile) {
       try {
           // Create FormData to handle file upload
@@ -135,6 +136,40 @@ class API {
           return data;
       } catch (error) {
           console.error('Update profile error:', error);
+          throw error;
+      }
+  }
+  
+  async removeAvatar() {
+      try {
+          const response = await fetch(`${this.baseUrl}/users/remove-avatar`, {
+              method: 'POST',
+              headers: this.getHeaders()
+          });
+          
+          // Check if response is OK
+          if (!response.ok) {
+              let errorMessage = 'Failed to remove avatar';
+              try {
+                  const errorData = await response.json();
+                  errorMessage = errorData.error || errorMessage;
+              } catch (e) {
+                  errorMessage = `Server error: ${response.status} ${response.statusText}`;
+              }
+              throw new Error(errorMessage);
+          }
+          
+          // Parse response
+          const data = await response.json();
+          
+          // Update user data in localStorage
+          const currentUser = this.getCurrentUser();
+          currentUser.avatarUrl = null;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+          
+          return data;
+      } catch (error) {
+          console.error('Remove avatar error:', error);
           throw error;
       }
   }

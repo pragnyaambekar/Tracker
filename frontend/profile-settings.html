@@ -103,6 +103,21 @@
             color: white;
             font-size: 40px;
         }
+        
+        .remove-avatar-btn {
+            background-color: #E6B2BA;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .remove-avatar-btn:hover {
+            background-color: #d98f98;
+        }
 
         .settings-form {
             width: 100%;
@@ -242,12 +257,13 @@
 
         <div class="profile-section">
             <div class="avatar-container">
-                <img id="avatar-preview" src="images/default-avatar.svg" alt="Your avatar" class="avatar-image">
+                <img id="avatar-preview" src="images/default-avatar.jpg" alt="Your avatar" class="avatar-image">
                 <div class="avatar-overlay" id="avatar-overlay">
                     <i class="fas fa-camera"></i>
                 </div>
                 <input type="file" id="avatar-upload" class="hidden" accept="image/*">
             </div>
+            <button type="button" id="remove-avatar-btn" class="remove-avatar-btn">Remove Profile Picture</button>
             <h2 id="username-display">Username</h2>
         </div>
 
@@ -310,6 +326,7 @@
         const avatarPreview = document.getElementById('avatar-preview');
         const avatarOverlay = document.getElementById('avatar-overlay');
         const avatarUpload = document.getElementById('avatar-upload');
+        const removeAvatarBtn = document.getElementById('remove-avatar-btn');
         const usernameDisplay = document.getElementById('username-display');
         const timezoneSelect = document.getElementById('timezone');
         const profileForm = document.getElementById('profile-form');
@@ -325,8 +342,10 @@
         // Set avatar if exists
         if (currentUser.avatarUrl && currentUser.avatarUrl !== 'null' && currentUser.avatarUrl !== 'undefined') {
             avatarPreview.src = currentUser.avatarUrl;
+            removeAvatarBtn.style.display = 'inline-block';
         } else {
-            avatarPreview.src = 'images/default-avatar.svg';
+            avatarPreview.src = 'images/default-avatar.jpg';
+            removeAvatarBtn.style.display = 'none';
         }
 
         // Event listeners
@@ -344,9 +363,40 @@
                 
                 reader.onload = function(e) {
                     avatarPreview.src = e.target.result;
+                    removeAvatarBtn.style.display = 'inline-block';
                 }
                 
                 reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Handle remove avatar button
+        removeAvatarBtn.addEventListener('click', async function() {
+            try {
+                // Show loading
+                loadingElement.style.display = 'block';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                
+                // Call API to remove avatar
+                await api.removeAvatar();
+                
+                // Update preview
+                avatarPreview.src = 'images/default-avatar.jpg';
+                removeAvatarBtn.style.display = 'none';
+                
+                // Clear any file input
+                avatarUpload.value = '';
+                
+                // Show success
+                successMessage.textContent = 'Profile picture removed successfully!';
+                successMessage.style.display = 'block';
+                loadingElement.style.display = 'none';
+            } catch (error) {
+                console.error('Error removing avatar:', error);
+                errorMessage.textContent = error.message || 'Error removing profile picture';
+                errorMessage.style.display = 'block';
+                loadingElement.style.display = 'none';
             }
         });
 

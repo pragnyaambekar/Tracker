@@ -138,4 +138,44 @@ router.put('/password', auth, async (req, res) => {
   }
 });
 
+// Remove user avatar
+router.post('/remove-avatar', auth, async (req, res) => {
+  try {
+    // Find user
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Check if user has a custom avatar
+    if (user.avatarUrl && user.avatarUrl.includes('user-')) {
+      // Delete the avatar file
+      try {
+        const avatarFilename = path.basename(user.avatarUrl);
+        const filePath = path.join(__dirname, '../uploads/avatars', avatarFilename);
+        
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted avatar file: ${filePath}`);
+        }
+      } catch (err) {
+        console.error('Error deleting avatar file:', err);
+        // Continue processing even if file deletion fails
+      }
+    }
+    
+    // Reset avatarUrl to null
+    user.avatarUrl = null;
+    await user.save();
+    
+    res.json({
+      success: true,
+      message: 'Avatar removed successfully'
+    });
+  } catch (error) {
+    console.error('Remove avatar error:', error);
+    res.status(500).json({ error: 'Server error during avatar removal' });
+  }
+});
+
 module.exports = router;
