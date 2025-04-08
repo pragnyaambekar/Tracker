@@ -337,6 +337,7 @@
         <div class="nav-links">
             <a href="comparison.html">Compare Progress</a>
             <!-- <a href="#" id="change-password-btn">Change Password</a> -->
+            <a href="profile-settings.html">Profile Settings</a>
             <a href="#" id="logout-btn" class="logout-btn">Logout</a>
         </div>
     </div>
@@ -429,9 +430,19 @@
         // Set username in the UI
         document.getElementById('userName').textContent =
             currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1);
+        // // Set user avatar
+        // const userAvatar = document.getElementById('userAvatar');
+        // userAvatar.src = currentUser.avatarUrl || '/api/placeholder/90/100';
+        // userAvatar.alt = currentUser.username + "'s avatar";
+
         // Set user avatar
         const userAvatar = document.getElementById('userAvatar');
-        userAvatar.src = currentUser.avatarUrl || '/api/placeholder/90/100';
+        // Check if avatarUrl exists and is valid
+        if (currentUser.avatarUrl && currentUser.avatarUrl !== 'null' && currentUser.avatarUrl !== 'undefined') {
+            userAvatar.src = currentUser.avatarUrl;
+        } else {
+            userAvatar.src = 'images/default-avatar.jpg';
+        }
         userAvatar.alt = currentUser.username + "'s avatar";
 
         let userStreak = 0;
